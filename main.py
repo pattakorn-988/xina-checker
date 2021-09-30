@@ -10,7 +10,8 @@ bot = commands.Bot(command_prefix='!')
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    channel = bot.get_channel(int(os.getenv('CHECKIN_CHANNEL')))
+    await channel.send('Checked in to work!')
     polling_job.start()
 
 
@@ -19,13 +20,13 @@ async def version(ctx, arg=None):
     if arg is None:
         await ctx.send('Which environment would you like to check? (aws, sit, uat)')
     elif arg == 'aws':
-        r = requests.get('https://sit-cd-scb-protect.iigdata.com/api/check_version')
+        r = requests.get(f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
         await ctx.send(r.json())
     elif arg == 'sit':
-        r = requests.get('https://sit-cd.scbprotect.io/api/check_version')
+        r = requests.get(f'{os.getenv("SIT_ENDPOINT")}/api/check_version')
         await ctx.send(r.json())
     elif arg == 'uat':
-        r = requests.get('https://uat-cd.scbprotect.io/api/check_version')
+        r = requests.get(f'{os.getenv("UAT_ENDPOINT")}/api/check_version')
         await ctx.send(r.json())
     else:
         await ctx.send('I don\'t understand, -20 social credit score.')
@@ -40,17 +41,17 @@ async def polling_job():
 
 
 async def poll_env(env):
-    earth = '<@311142730241933324>'
-    lady = '<@839317682968068116>'
-    tk = '<@365513774242988042>'
-    boat = '<@796929182713905174>'
-    pin = '<@692036135609827358>'
+    earth = f'<@{os.getenv("EA")}>'
+    lady = f'<@{os.getenv("LD")}>'
+    tk = f'<@{os.getenv("TK")}>'
+    boat = f'<@{os.getenv("BT")}>'
+    pin = f'<@{os.getenv("PN")}>'
 
     endpoint = {
-        'aws': 'https://sit-cd-scb-protect.iigdata.com/api/check_version',
-        'sit': 'https://sit-cd.scbprotect.io/api/check_version',
-        'uat': 'https://uat-cd.scbprotect.io/api/check_version',
-    }.get(env, 'https://sit-cd-scb-protect.iigdata.com/api/check_version')
+        'aws': f'{os.getenv("AWS_ENDPOINT")}/api/check_version',
+        'sit': f'{os.getenv("SIT_ENDPOINT")}/api/check_version',
+        'uat': f'{os.getenv("UAT_ENDPOINT")}/api/check_version',
+    }.get(env, f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
 
     r = requests.get(endpoint)
     env_file_check = Path(f'{env}.txt')
