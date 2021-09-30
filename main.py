@@ -76,7 +76,8 @@ async def poll_env(env):
             'uat': f'\n{pin} {earth}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
         }.get(env, f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}')
 
-        await channel.send(templates)
+        if old_v:
+            await channel.send(templates)
 
 
 if __name__ == '__main__':
