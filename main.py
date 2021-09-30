@@ -31,7 +31,7 @@ async def version(ctx, arg=None):
         await ctx.send('I don\'t understand, -20 social credit score.')
 
 
-@tasks.loop(seconds=10.0)
+@tasks.loop(minutes=5.0)
 async def polling_job():
     await bot.wait_until_ready()
     await poll_env('aws')
