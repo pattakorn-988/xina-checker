@@ -54,31 +54,32 @@ async def poll_env(env):
     }.get(env, f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
 
     r = requests.get(endpoint)
-    env_file_check = Path(f'{env}.txt')
-    env_file_check.touch(exist_ok=True)
+    if r.status_code == 200:
+        env_file_check = Path(f'{env}.txt')
+        env_file_check.touch(exist_ok=True)
 
-    env_read = open(env_file_check, 'r')
+        env_read = open(env_file_check, 'r')
 
-    env_v = r.text
-    old_v = env_read.read()
-    env_changed = old_v != env_v
+        env_v = r.text
+        old_v = env_read.read()
+        env_changed = old_v != env_v
 
-    env_read.close()
+        env_read.close()
 
-    if env_changed:
-        env_write = open(env_file_check, 'w+')
-        env_write.write(env_v)
-        env_write.close()
-        channel = bot.get_channel(int(os.getenv('CHANNEL')))
+        if env_changed:
+            env_write = open(env_file_check, 'w+')
+            env_write.write(env_v)
+            env_write.close()
+            channel = bot.get_channel(int(os.getenv('CHANNEL')))
 
-        templates = {
-            'aws': f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
-            'sit': f'\n{lady} {earth}\nSIT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
-            'uat': f'\n{pin} {earth}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
-        }.get(env, f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}')
+            templates = {
+                'aws': f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+                'sit': f'\n{lady} {earth}\nSIT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+                'uat': f'\n{pin} {earth}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+            }.get(env, f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}')
 
-        if old_v:
-            await channel.send(templates)
+            if old_v:
+                await channel.send(templates)
 
 
 if __name__ == '__main__':
