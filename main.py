@@ -33,6 +33,16 @@ async def version(ctx, arg=None):
         await ctx.send('I don\'t understand, -20 social credit score.')
 
 
+@bot.command()
+async def fchk(ctx, arg=None):
+    if arg is None:
+        await ctx.send('Force check version diff\nUsage: !fchk <env>')
+    elif arg in ['aws', 'sit', 'uat']:
+        await poll_env(arg, True)
+    else:
+        await ctx.send('I don\'t understand, -20 social credit score.')
+
+
 @tasks.loop(minutes=5.0)
 async def polling_job():
     await bot.wait_until_ready()
@@ -41,7 +51,7 @@ async def polling_job():
     await poll_env('uat')
 
 
-async def poll_env(env):
+async def poll_env(env, force=False):
     earth = f'<@{os.getenv("EA")}>'
     lady = f'<@{os.getenv("LD")}>'
     tk = f'<@{os.getenv("TK")}>'
@@ -81,6 +91,9 @@ async def poll_env(env):
 
             if old_v:
                 await channel.send(templates)
+        elif not env_changed and force:
+            channel = bot.get_channel(int(os.getenv('CHANNEL')))
+            await channel.send(f'No change detected in {env.upper()}')
 
 
 if __name__ == '__main__':
