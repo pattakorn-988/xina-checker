@@ -12,7 +12,8 @@ bot = commands.Bot(command_prefix='!')
 async def on_ready():
     channel = bot.get_channel(int(os.getenv('CHECKIN_CHANNEL')))
     await channel.send('Checked in to work!')
-    polling_job.start()
+    if not polling_job.is_running():
+        polling_job.start()
 
 
 @bot.command()
