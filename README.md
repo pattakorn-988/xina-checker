@@ -23,6 +23,9 @@ sudo nano /etc/systemd/system/xina.service
 ```
 [Unit]
 Description=John Xina, Sitecore Checker
+After=multi-user.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
