@@ -68,16 +68,13 @@ async def poll_env(env, force=False):
     }.get(env, f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
     force_res = None
     r = requests.get(endpoint)
-    # print('requested')
     if r.status_code == 200:
         path = os.path.join(pathlib.Path(__file__).parent, f'{env}.txt')
-        # print(os.path.join(pathlib.Path(__file__).parent, f'{env}.txt'))
         env_file_check = pathlib.Path(path)
         env_file_check.touch(exist_ok=True)
 
         env_read = open(env_file_check, 'r')
 
-        # print(env_read)
         env_v = r.text
         old_v = env_read.read()
         env_changed = old_v != env_v
@@ -101,8 +98,6 @@ async def poll_env(env, force=False):
             if old_v:
                 await channel.send(templates)
         elif not env_changed and force:
-            # channel = bot.get_channel(int(os.getenv('CHANNEL')))
-            # await channel.send(f'No change detected in {env.upper()}')
             force_res = f'No change detected in {env.upper()}'
 
     return force_res
