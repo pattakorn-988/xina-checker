@@ -16,7 +16,9 @@ python3 main.py
 ```
 
 ### Run as systemd service
-
+```
+chmod 766 {env}.txt
+```
 ```
 sudo nano /etc/systemd/system/xina.service
 ```
