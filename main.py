@@ -39,7 +39,9 @@ async def fchk(ctx, arg=None):
     if arg is None:
         await ctx.send('Force check version diff\nUsage: !fchk <env>')
     elif arg in ['aws', 'sit', 'uat']:
-        await poll_env(arg, True)
+        result = await poll_env(arg, True)
+        if result:
+            await ctx.send(result)
     else:
         await ctx.send('I don\'t understand, -20 social credit score.')
 
@@ -64,7 +66,7 @@ async def poll_env(env, force=False):
         'sit': f'{os.getenv("SIT_ENDPOINT")}/api/check_version',
         'uat': f'{os.getenv("UAT_ENDPOINT")}/api/check_version',
     }.get(env, f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
-
+    force_res = None
     r = requests.get(endpoint)
     # print('requested')
     if r.status_code == 200:
@@ -94,11 +96,16 @@ async def poll_env(env, force=False):
                 'uat': f'\n{pin} {earth}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
             }.get(env, f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}')
 
+            if force:
+                force_res = f'Change detected in {env.upper()}, announcing...'
             if old_v:
                 await channel.send(templates)
         elif not env_changed and force:
-            channel = bot.get_channel(int(os.getenv('CHANNEL')))
-            await channel.send(f'No change detected in {env.upper()}')
+            # channel = bot.get_channel(int(os.getenv('CHANNEL')))
+            # await channel.send(f'No change detected in {env.upper()}')
+            force_res = f'No change detected in {env.upper()}'
+
+    return force_res
 
 
 if __name__ == '__main__':
