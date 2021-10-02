@@ -65,12 +65,14 @@ async def poll_env(env, force=False):
     }.get(env, f'{os.getenv("AWS_ENDPOINT")}/api/check_version')
 
     r = requests.get(endpoint)
+    print('requested')
     if r.status_code == 200:
         env_file_check = Path(f'{env}.txt')
         env_file_check.touch(exist_ok=True)
 
         env_read = open(env_file_check, 'r')
 
+        print(env_read)
         env_v = r.text
         old_v = env_read.read()
         env_changed = old_v != env_v
