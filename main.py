@@ -46,12 +46,19 @@ async def fchk(ctx, arg=None):
         await ctx.send('I don\'t understand, -20 social credit score.')
 
 
+@bot.command()
+async def cache(ctx, arg=None):
+    result = await check_cache()
+    await ctx.send(result)
+
+
 @tasks.loop(minutes=5.0)
 async def polling_job():
     await bot.wait_until_ready()
     await poll_env('aws')
     await poll_env('sit')
     await poll_env('uat')
+    await check_cache()
 
 
 async def poll_env(env, force=False):
@@ -101,6 +108,25 @@ async def poll_env(env, force=False):
             force_res = f'No change detected in {env.upper()}'
 
     return force_res
+
+
+async def check_cache():
+    pin = f'<@{os.getenv("PN")}>'
+    endpoint = os.getenv('PROD_CACHE')
+    r = requests.get(endpoint)
+    if r.status_code == 200:
+        fetched_items = r.json()['data']['search']['results']['items']
+        # fetched_items = []
+        count = len(fetched_items)
+        if count == 0:
+            template = f'\n{pin} \nCache problem detected\n\tEndpoint: {os.getenv("PROD_CACHE")}\n\tItems: {fetched_items}'
+            channel = bot.get_channel(int(os.getenv('CHANNEL')))
+            await channel.send(template)
+            return 'Cache problem detected, announcing...'
+        else:
+            return 'Query response OK.'
+    else:
+        return 'Some error occurred while querying data.'
 
 
 if __name__ == '__main__':
