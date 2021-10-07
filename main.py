@@ -112,22 +112,52 @@ async def poll_env(env, force=False):
 
 async def check_cache():
     pin = f'<@{os.getenv("PN")}>'
-    endpoint = os.getenv('PROD_CACHE')
-    r = requests.get(endpoint)
-    if r.status_code == 200:
-        fetched_items = r.json()['data']['search']['results']['items']
-        # fetched_items = []
-        count = len(fetched_items)
-        if count == 0:
-            template = f'\n{pin} \nCache problem detected\n\tEndpoint: {os.getenv("PROD_CACHE")}\n\tItems: {fetched_items}'
-            channel = bot.get_channel(int(os.getenv('CHANNEL')))
-            await channel.send(template)
-            return 'Cache problem detected, announcing...'
+    response = 'Query response OK.'
+    selected_info = {
+        'pa': 'PA',
+        'm1': 'Motor 1, Honda Civic',
+        'm2': 'Motor 2, Nissan Almera',
+        'm2+': 'Motor 2+, Mazda 3',
+        'm3': 'Motor 3, Toyota Vigo',
+        'm3+': 'Motor 3+, Toyota Vios',
+    }
+    type_endpoint = {
+        'pa': os.getenv('PROD_CACHE'),
+        'm1': os.getenv('PROD_CACHE_M1'),
+        'm2': os.getenv('PROD_CACHE_M2'),
+        'm2+': os.getenv('PROD_CACHE_M2+'),
+        'm3': os.getenv('PROD_CACHE_M3'),
+        'm3+': os.getenv('PROD_CACHE_M3+'),
+    }
+    type_response = {
+        'pa': '',
+        'm1': '',
+        'm2': '',
+        'm2+': '',
+        'm3': '',
+        'm3+': '',
+    }
+    for key in type_endpoint:
+        endpoint = type_endpoint[key]
+        r = requests.get(endpoint)
+        if r.status_code == 200:
+            fetched_items = r.json()['data']['search']['results']['items']
+            # fetched_items = []
+            count = len(fetched_items)
+            if count == 0:
+                template = f'{pin}\nCache problem detected: {selected_info[key]}\n\tEndpoint: {type_endpoint[key]}'
+                type_response[key] = template
+                # return 'Cache problem detected, announcing...'
         else:
-            return 'Query response OK.'
-    else:
-        return 'Some error occurred while querying data.'
+            type_response[key] = f'Some error occurred while querying {selected_info[key]}.'
 
+    for key in type_response:
+        if type_response[key]:
+            channel = bot.get_channel(int(os.getenv('CHANNEL')))
+            await channel.send(type_response[key])
+            response = 'Cache problem detected.'
+
+    return response
 
 if __name__ == '__main__':
     bot.run(os.getenv('TOKEN'))
