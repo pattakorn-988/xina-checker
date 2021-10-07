@@ -115,8 +115,8 @@ async def check_cache():
     endpoint = os.getenv('PROD_CACHE')
     r = requests.get(endpoint)
     if r.status_code == 200:
-        fetched_items = r.json()['data']['search']['results']['items']
-        # fetched_items = []
+        # fetched_items = r.json()['data']['search']['results']['items']
+        fetched_items = []
         count = len(fetched_items)
         if count == 0:
             template = f'\n{pin} \nCache problem detected\n\tEndpoint: {os.getenv("PROD_CACHE")}\n\tItems: {fetched_items}'
