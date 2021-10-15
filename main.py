@@ -67,6 +67,7 @@ async def poll_env(env, force=False):
     tk = f'<@{os.getenv("TK")}>'
     boat = f'<@{os.getenv("BT")}>'
     pin = f'<@{os.getenv("PN")}>'
+    mint = f'<@{os.getenv("MN")}>'
 
     endpoint = {
         'aws': f'{os.getenv("AWS_ENDPOINT")}/api/check_version',
@@ -95,9 +96,9 @@ async def poll_env(env, force=False):
             channel = bot.get_channel(int(os.getenv('CHANNEL')))
 
             templates = {
-                'aws': f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
-                'sit': f'\n{lady} {earth}\nSIT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
-                'uat': f'\n{pin} {earth}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+                'aws': f'\n{earth} {boat} {tk} {mint}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+                'sit': f'\n{lady} {pin} {mint}\nSIT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
+                'uat': f'\n{pin} {lady} {mint}\nUAT version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}',
             }.get(env, f'\n{earth} {boat} {tk}\nAWS version changed\nOld:\n\t{old_v}\n\nNew:\n\t{env_v}')
 
             if force:
