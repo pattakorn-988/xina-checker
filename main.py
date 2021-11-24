@@ -55,7 +55,7 @@ async def cache(ctx, arg=None):
 @tasks.loop(minutes=5.0)
 async def polling_job():
     await bot.wait_until_ready()
-    await poll_env('aws')
+    # await poll_env('aws')
     # await poll_env('sit')
     # await poll_env('uat')
     await check_cache()
